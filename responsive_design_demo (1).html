@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Responsive Design · CSS Media Queries</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ── DESIGN TOKENS ─────────────────────────────────── */
+:root {
+  --ink:      #1a1917;
+  --ink-2:    #4a4844;
+  --ink-3:    #918f8b;
+  --paper:    #f5f3ee;
+  --surface:  #fffefb;
+  --accent:   #c8401a;
+  --accent-2: #f0ede6;
+  --border:   #e0dcd3;
+  --code-bg:  #1e1c1a;
+  --code-fg:  #e8e4de;
+  --code-hl:  #3a2e26;
+  --keyword:  #e87c4a;
+  --value:    #68b89a;
+  --prop:     #7fb3d4;
+  --comment:  #7a7268;
+  --radius:   6px;
+  --nav-h:    64px;
+}
+
+/* ── RESET ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* ── NAV ────────────────────────────────────────────── */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: var(--nav-h);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 clamp(1.25rem, 5vw, 3rem);
+  gap: 2rem;
+}
+
+.nav-logo {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.nav-logo span { color: var(--accent); }
+
+.nav-links {
+  display: flex;
+  gap: 1.5rem;
+  list-style: none;
+  margin-left: auto;
+}
+.nav-links a {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ink-2);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.nav-links a:hover { color: var(--accent); }
+
+.nav-cta {
+  padding: 0.45rem 1rem;
+  background: var(--accent);
+  color: #fff !important;
+  border-radius: var(--radius);
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  white-space: nowrap;
+}
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  padding: 4px;
+  margin-left: auto;
+  background: none;
+  border: none;
+}
+.hamburger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--ink);
+  transition: transform 0.25s, opacity 0.25s;
+  transform-origin: center;
+}
+.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: var(--nav-h);
+  left: 0; right: 0;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 1.5rem 1.5rem;
+  z-index: 99;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.mobile-menu.open { display: flex; }
+.mobile-menu a {
+  display: block;
+  padding: 0.65rem 0;
+  color: var(--ink-2);
+  text-decoration: none;
+  font-weight: 500;
+  border-bottom: 1px solid var(--border);
+}
+.mobile-menu a:last-child { border-bottom: none; }
+
+/* ── HERO ────────────────────────────────────────────── */
+.hero {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: clamp(3rem, 8vw, 6rem) clamp(1.25rem, 5vw, 3rem);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(2rem, 4vw, 4rem);
+  align-items: center;
+}
+
+.hero-text h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.25rem;
+}
+.hero-text h1 em {
+  font-style: italic;
+  font-weight: 300;
+  color: var(--accent);
+}
+
+.hero-text p {
+  color: var(--ink-2);
+  font-size: clamp(0.95rem, 1.8vw, 1.1rem);
+  max-width: 42ch;
+  margin-bottom: 2rem;
+}
+
+.btn-group { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.btn-primary {
+  padding: 0.7rem 1.5rem;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 0.925rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s, transform 0.1s;
+}
+.btn-primary:hover { background: #a83415; transform: translateY(-1px); }
+
+.btn-secondary {
+  padding: 0.7rem 1.5rem;
+  background: transparent;
+  color: var(--ink-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.925rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color 0.15s, color 0.15s;
+}
+.btn-secondary:hover { border-color: var(--ink-3); color: var(--ink); }
+
+/* Breakpoint badge */
+.bp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.75rem;
+  background: var(--code-bg);
+  color: var(--keyword);
+  border-radius: 100px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.78rem;
+  margin-bottom: 1rem;
+}
+.bp-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--value);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+/* Hero device illustration */
+.hero-visual {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+}
+
+.device {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+  position: relative;
+  flex-shrink: 0;
+}
+.device-bar {
+  height: 28px;
+  background: var(--accent-2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  gap: 5px;
+}
+.dot { width: 8px; height: 8px; border-radius: 50%; }
+.d-r { background: #f07070; }
+.d-y { background: #f0c060; }
+.d-g { background: #70c080; }
+
+.device-desktop { width: 280px; }
+.device-tablet  { width: 160px; transform: rotate(3deg); }
+.device-phone   { width: 80px;  transform: rotate(-4deg); }
+
+.mock-content { padding: 10px; }
+.mock-nav  { height: 14px; background: var(--border); border-radius: 3px; margin-bottom: 8px; }
+.mock-hero { height: 48px; background: var(--accent-2); border-radius: 4px; margin-bottom: 8px; }
+.mock-grid { display: grid; gap: 4px; }
+.mock-grid-2 { grid-template-columns: 1fr 1fr; }
+.mock-grid-1 { grid-template-columns: 1fr; }
+.mock-card  { height: 30px; background: var(--border); border-radius: 3px; }
+.mock-text  { height: 6px; background: #ddd; border-radius: 2px; margin-top: 4px; }
+.mock-text.short { width: 60%; }
+
+/* ── BREAKPOINTS LEGEND ──────────────────────────────── */
+.section {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 4rem) clamp(1.25rem, 5vw, 3rem);
+}
+
+.section-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+.section h2 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  margin-bottom: 0.5rem;
+}
+
+.section > p {
+  color: var(--ink-2);
+  max-width: 56ch;
+  margin-bottom: 2.5rem;
+}
+
+/* breakpoint ruler */
+.bp-ruler {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  overflow-x: auto;
+}
+.ruler-track {
+  position: relative;
+  height: 48px;
+  border-radius: 4px;
+  background: linear-gradient(to right,
+    #e8f4fc 0%, #e8f4fc 37.5%,
+    #e8f0e4 37.5%, #e8f0e4 60%,
+    #f0e8e4 60%, #f0e8e4 80%,
+    #ece8f4 80%, #ece8f4 100%
+  );
+  min-width: 400px;
+}
+.ruler-markers {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+}
+.ruler-mark {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 1px;
+  background: rgba(0,0,0,0.2);
+}
+.ruler-label {
+  position: absolute;
+  bottom: -22px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--ink-3);
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+.ruler-zone-label {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--ink-2);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.ruler-wrap { padding-bottom: 28px; }
+
+.bp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  margin-top: 1rem;
+}
+.bp-table th {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--border);
+}
+.bp-table td {
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.bp-table tr:last-child td { border-bottom: none; }
+.tag {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 100px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+}
+.tag-mobile  { background: #e8f4fc; color: #1a5a8a; }
+.tag-tablet  { background: #e8f0e4; color: #2a5a1a; }
+.tag-desktop { background: #f0e8e4; color: #7a2a1a; }
+.tag-wide    { background: #ece8f4; color: #3a1a7a; }
+
+/* ── CODE SHOWCASE ───────────────────────────────────── */
+.code-showcase {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.code-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.code-card-header {
+  padding: 0.75rem 1rem;
+  background: var(--accent-2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.code-card-header span {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+.code-card-icon {
+  width: 18px; height: 18px;
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+}
+.icon-mobile  { background: #c8e8fc; color: #1a5a8a; }
+.icon-desktop { background: #f4c8b0; color: #7a2a1a; }
+
+pre {
+  margin: 0;
+  padding: 1.25rem;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.78rem;
+  line-height: 1.7;
+  background: var(--code-bg);
+  color: var(--code-fg);
+  overflow-x: auto;
+}
+
+.kw  { color: var(--keyword); }
+.val { color: var(--value); }
+.pr  { color: var(--prop); }
+.cm  { color: var(--comment); font-style: italic; }
+.hl  { background: var(--code-hl); display: block; margin: 0 -1.25rem; padding: 0 1.25rem; border-left: 2px solid var(--keyword); }
+
+/* ── FEATURE GRID ─────────────────────────────────────── */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+.feature-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem;
+}
+.feature-icon {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+.fi-1 { background: #fce8d8; }
+.fi-2 { background: #d8ecd8; }
+.fi-3 { background: #d8e4fc; }
+.fi-4 { background: #fcd8e8; }
+.fi-5 { background: #fce4d8; }
+.fi-6 { background: #e4d8fc; }
+
+.feature-card h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+.feature-card p {
+  font-size: 0.875rem;
+  color: var(--ink-2);
+}
+
+/* ── LIVE DEMO SECTION ──────────────────────────────── */
+.demo-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 1rem;
+}
+.demo-toolbar {
+  padding: 0.75rem 1rem;
+  background: var(--accent-2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.demo-toolbar span { font-size: 0.8rem; font-weight: 500; color: var(--ink-2); }
+.size-btns { display: flex; gap: 0.5rem; }
+.size-btn {
+  padding: 0.3rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  cursor: pointer;
+  color: var(--ink-2);
+  transition: all 0.15s;
+}
+.size-btn:hover, .size-btn.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+.demo-viewport {
+  transition: max-width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  max-width: 100%;
+  margin: 0 auto;
+}
+.demo-inner {
+  padding: clamp(1rem, 3vw, 2rem);
+  background: var(--paper);
+}
+
+/* Demo card grid inside demo */
+.demo-cards {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+.demo-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  font-size: 0.85rem;
+}
+.demo-card-img {
+  height: 80px;
+  border-radius: 6px;
+  margin-bottom: 0.75rem;
+}
+.demo-card h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem; }
+.demo-card p  { color: var(--ink-2); font-size: 0.8rem; }
+.c1 { background: #fce8d8; }
+.c2 { background: #d8ecd8; }
+.c3 { background: #d8e4fc; }
+.c4 { background: #fce4e8; }
+
+/* ── FOOTER ────────────────────────────────────────────── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: clamp(2rem, 4vw, 3rem) clamp(1.25rem, 5vw, 3rem);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+footer p { font-size: 0.82rem; color: var(--ink-3); }
+.footer-links { display: flex; gap: 1.25rem; }
+.footer-links a { font-size: 0.82rem; color: var(--ink-3); text-decoration: none; }
+.footer-links a:hover { color: var(--ink); }
+
+/* ═══ MEDIA QUERIES ══════════════════════════════════════
+   Breakpoints:
+     < 480px  → xs / phone portrait
+     480–767  → sm / phone landscape
+     768–1023 → md / tablet
+     1024+    → lg / desktop (base styles above)
+════════════════════════════════════════════════════════ */
+
+/* TABLET (768px and below) */
+@media (max-width: 768px) {
+  .hero {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .hero-text p { margin-left: auto; margin-right: auto; }
+  .btn-group { justify-content: center; }
+
+  .hero-visual {
+    justify-content: center;
+    order: -1;
+  }
+  .device-desktop { width: 220px; }
+  .device-tablet  { width: 130px; }
+  .device-phone   { width: 65px; }
+
+  .code-showcase {
+    grid-template-columns: 1fr;
+  }
+
+  .feature-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* MOBILE (480px and below) */
+@media (max-width: 480px) {
+  .nav-links  { display: none; }
+  .hamburger  { display: flex; }
+
+  .hero-visual .device-tablet,
+  .hero-visual .device-phone {
+    display: none;
+  }
+  .device-desktop { width: 200px; }
+
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bp-table th:nth-child(3),
+  .bp-table td:nth-child(3) {
+    display: none;
+  }
+
+  .footer-links { display: none; }
+  footer { justify-content: center; text-align: center; }
+}
+
+/* WIDE SCREENS (1200px+) */
+@media (min-width: 1200px) {
+  .feature-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* PRINT */
+@media print {
+  nav, .hero-visual, .demo-wrap, footer { display: none; }
+  .hero { grid-template-columns: 1fr; padding: 1rem 0; }
+  .code-showcase { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">Responsive<span>.</span>css</a>
+  <ul class="nav-links">
+    <li><a href="#breakpoints">Breakpoints</a></li>
+    <li><a href="#syntax">Syntax</a></li>
+    <li><a href="#patterns">Patterns</a></li>
+    <li><a href="#demo">Live demo</a></li>
+    <li><a href="#" class="nav-cta">Get starter kit</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#breakpoints">Breakpoints</a>
+  <a href="#syntax">Syntax</a>
+  <a href="#patterns">Patterns</a>
+  <a href="#demo">Live demo</a>
+  <a href="#" style="color: var(--accent); font-weight: 600;">Get starter kit</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-text">
+    <div class="bp-badge">
+      <div class="bp-dot"></div>
+      <span id="currentBp">detecting…</span>
+    </div>
+    <h1>Responsive design<br>with <em>CSS media</em><br>queries</h1>
+    <p>A complete reference for adapting layouts, typography, and components across every screen size — from 320px phones to 4K displays.</p>
+    <div class="btn-group">
+      <a href="#demo" class="btn-primary">See live demo →</a>
+      <a href="#syntax" class="btn-secondary">View syntax</a>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="device device-phone">
+      <div class="device-bar"><div class="dot d-r"></div><div class="dot d-y"></div><div class="dot d-g"></div></div>
+      <div class="mock-content">
+        <div class="mock-nav"></div>
+        <div class="mock-hero"></div>
+        <div class="mock-grid mock-grid-1">
+          <div class="mock-card"></div>
+          <div class="mock-text short"></div>
+        </div>
+      </div>
+    </div>
+    <div class="device device-tablet">
+      <div class="device-bar"><div class="dot d-r"></div><div class="dot d-y"></div><div class="dot d-g"></div></div>
+      <div class="mock-content">
+        <div class="mock-nav"></div>
+        <div class="mock-hero"></div>
+        <div class="mock-grid mock-grid-2">
+          <div class="mock-card"></div>
+          <div class="mock-card"></div>
+          <div class="mock-text"></div>
+          <div class="mock-text short"></div>
+        </div>
+      </div>
+    </div>
+    <div class="device device-desktop">
+      <div class="device-bar"><div class="dot d-r"></div><div class="dot d-y"></div><div class="dot d-g"></div></div>
+      <div class="mock-content">
+        <div class="mock-nav"></div>
+        <div class="mock-hero"></div>
+        <div class="mock-grid mock-grid-2" style="grid-template-columns:1fr 1fr 1fr;">
+          <div class="mock-card"></div>
+          <div class="mock-card"></div>
+          <div class="mock-card"></div>
+          <div class="mock-text"></div>
+          <div class="mock-text short"></div>
+          <div class="mock-text"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BREAKPOINTS -->
+<section class="section" id="breakpoints">
+  <div class="section-label">Reference</div>
+  <h2>Standard breakpoints</h2>
+  <p>The most widely-used breakpoint system, based on device viewport widths found in the wild.</p>
+
+  <div class="bp-ruler">
+    <div class="ruler-wrap">
+      <div class="ruler-track" style="position:relative;">
+        <span class="ruler-zone-label" style="left:19%;">📱 Mobile</span>
+        <span class="ruler-zone-label" style="left:49%;">⬡ Tablet</span>
+        <span class="ruler-zone-label" style="left:70%;">🖥 Desktop</span>
+        <span class="ruler-zone-label" style="left:90%;">⬛ Wide</span>
+        <div class="ruler-mark" style="left:37.5%;"><span class="ruler-label">480px</span></div>
+        <div class="ruler-mark" style="left:60%;"><span class="ruler-label">768px</span></div>
+        <div class="ruler-mark" style="left:80%;"><span class="ruler-label">1024px</span></div>
+      </div>
+    </div>
+  </div>
+
+  <table class="bp-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Range</th>
+        <th>Media query</th>
+        <th>Typical layout</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="tag tag-mobile">Mobile</span></td>
+        <td>< 480px</td>
+        <td><code style="font-family:'DM Mono',monospace;font-size:0.8rem;">max-width: 480px</code></td>
+        <td>Single column, stacked nav</td>
+      </tr>
+      <tr>
+        <td><span class="tag tag-tablet">Tablet</span></td>
+        <td>480px – 767px</td>
+        <td><code style="font-family:'DM Mono',monospace;font-size:0.8rem;">max-width: 768px</code></td>
+        <td>2-column grid, condensed nav</td>
+      </tr>
+      <tr>
+        <td><span class="tag tag-desktop">Desktop</span></td>
+        <td>768px – 1023px</td>
+        <td><code style="font-family:'DM Mono',monospace;font-size:0.8rem;">min-width: 768px</code></td>
+        <td>3-column grid, full nav</td>
+      </tr>
+      <tr>
+        <td><span class="tag tag-wide">Wide</span></td>
+        <td>1024px +</td>
+        <td><code style="font-family:'DM Mono',monospace;font-size:0.8rem;">min-width: 1024px</code></td>
+        <td>Max-width container, spacious</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- SYNTAX -->
+<section class="section" id="syntax" style="padding-top:0;">
+  <div class="section-label">Syntax</div>
+  <h2>Essential patterns</h2>
+  <p>The four most-used media query patterns — copy and adapt these for your project.</p>
+
+  <div class="code-showcase">
+    <div class="code-card">
+      <div class="code-card-header">
+        <div class="code-card-icon icon-mobile">M</div>
+        <span>Mobile-first (recommended)</span>
+      </div>
+<pre><span class="cm">/* Base styles = mobile */</span>
+.card {
+  <span class="pr">display</span>: <span class="val">block</span>;
+  <span class="pr">width</span>: <span class="val">100%</span>;
+}
+
+<span class="cm">/* Scale up for larger screens */</span>
+<span class="kw">@media</span> (min-width: <span class="val">768px</span>) {
+<span class="hl">  .card { display: <span class="val">grid</span>; }</span>
+}
+
+<span class="kw">@media</span> (min-width: <span class="val">1024px</span>) {
+<span class="hl">  .card { grid-template-columns: <span class="val">1fr 1fr 1fr</span>; }</span>
+}</pre>
+    </div>
+    <div class="code-card">
+      <div class="code-card-header">
+        <div class="code-card-icon icon-desktop">D</div>
+        <span>Desktop-first</span>
+      </div>
+<pre><span class="cm">/* Base styles = desktop */</span>
+.nav-links {
+  <span class="pr">display</span>: <span class="val">flex</span>;
+  <span class="pr">gap</span>: <span class="val">2rem</span>;
+}
+
+<span class="cm">/* Override for smaller screens */</span>
+<span class="kw">@media</span> (max-width: <span class="val">768px</span>) {
+<span class="hl">  .nav-links { display: <span class="val">none</span>; }</span>
+}
+
+<span class="kw">@media</span> (max-width: <span class="val">480px</span>) {
+<span class="hl">  .hamburger { display: <span class="val">flex</span>; }</span>
+}</pre>
+    </div>
+    <div class="code-card">
+      <div class="code-card-header">
+        <div class="code-card-icon" style="background:#d8ecd8;color:#2a5a1a;">R</div>
+        <span>Range queries</span>
+      </div>
+<pre><span class="cm">/* Target a specific range only */</span>
+<span class="kw">@media</span> (
+  min-width: <span class="val">480px</span>
+) <span class="kw">and</span> (
+  max-width: <span class="val">767px</span>
+) {
+<span class="hl">  .sidebar { width: <span class="val">240px</span>; }</span>
+}
+
+<span class="cm">/* Modern syntax (CSS Level 4) */</span>
+<span class="kw">@media</span> (<span class="val">480px</span> <= width <= <span class="val">767px</span>) {
+<span class="hl">  .sidebar { width: <span class="val">240px</span>; }</span>
+}</pre>
+    </div>
+    <div class="code-card">
+      <div class="code-card-header">
+        <div class="code-card-icon" style="background:#ece8f4;color:#3a1a7a;">F</div>
+        <span>Fluid typography</span>
+      </div>
+<pre><span class="cm">/* clamp() — no media query needed */</span>
+h1 {
+<span class="hl">  font-size: <span class="val">clamp</span>(
+    <span class="val">1.8rem</span>,   <span class="cm">/* min */</span>
+    <span class="val">5vw</span>,      <span class="cm">/* fluid */</span>
+    <span class="val">3.6rem</span>    <span class="cm">/* max */</span>
+  );</span>
+}
+
+<span class="cm">/* Fluid spacing too */</span>
+.section {
+  <span class="pr">padding</span>: <span class="val">clamp</span>(<span class="val">1.5rem</span>, <span class="val">5vw</span>, <span class="val">4rem</span>);
+}</pre>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURE GRID -->
+<section class="section" id="patterns" style="padding-top:0;">
+  <div class="section-label">Techniques</div>
+  <h2>Responsive patterns</h2>
+  <p>Six layout and styling techniques that work together with media queries.</p>
+
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="feature-icon fi-1">📐</div>
+      <h3>CSS Grid</h3>
+      <p>Use <code style="font-family:'DM Mono',monospace;font-size:0.8rem;">repeat(auto-fit, minmax(200px, 1fr))</code> for a grid that adapts automatically without media queries.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-2">🔄</div>
+      <h3>Flexbox wrap</h3>
+      <p>Flex containers with <code style="font-family:'DM Mono',monospace;font-size:0.8rem;">flex-wrap: wrap</code> naturally reflow children as space shrinks.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-3">✏️</div>
+      <h3>Fluid type</h3>
+      <p><code style="font-family:'DM Mono',monospace;font-size:0.8rem;">clamp()</code> scales font sizes smoothly between a minimum and maximum — no breakpoints needed.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-4">🖼</div>
+      <h3>Responsive images</h3>
+      <p>Set <code style="font-family:'DM Mono',monospace;font-size:0.8rem;">max-width: 100%</code> and use the <code style="font-family:'DM Mono',monospace;font-size:0.8rem;">srcset</code> attribute to serve the right resolution per device.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-5">☰</div>
+      <h3>Navigation</h3>
+      <p>Hide the full nav at small sizes with <code style="font-family:'DM Mono',monospace;font-size:0.8rem;">display: none</code> and reveal a hamburger menu via a media query.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-6">🎨</div>
+      <h3>Container queries</h3>
+      <p>The new <code style="font-family:'DM Mono',monospace;font-size:0.8rem;">@container</code> rule lets components respond to their <em>parent's</em> size, not just the viewport.</p>
+    </div>
+  </div>
+</section>
+
+<!-- LIVE DEMO -->
+<section class="section" id="demo" style="padding-top:0;">
+  <div class="section-label">Interactive</div>
+  <h2>Simulate breakpoints</h2>
+  <p>Click a viewport size to preview how the card grid reflows. Resize your browser window to see the real thing.</p>
+
+  <div class="demo-wrap">
+    <div class="demo-toolbar">
+      <span>Viewport:</span>
+      <div class="size-btns">
+        <button class="size-btn" data-w="320">320px</button>
+        <button class="size-btn" data-w="480">480px</button>
+        <button class="size-btn" data-w="768">768px</button>
+        <button class="size-btn active" data-w="100%">Full width</button>
+      </div>
+      <span id="gridLabel" style="margin-left:auto;font-size:0.8rem;color:var(--ink-3);">auto-fit grid</span>
+    </div>
+    <div class="demo-viewport" id="demoViewport">
+      <div class="demo-inner">
+        <div class="demo-cards">
+          <div class="demo-card">
+            <div class="demo-card-img c1"></div>
+            <h4>Grid systems</h4>
+            <p>Auto-fit columns reflow without media queries.</p>
+          </div>
+          <div class="demo-card">
+            <div class="demo-card-img c2"></div>
+            <h4>Fluid spacing</h4>
+            <p>clamp() keeps padding proportional at any size.</p>
+          </div>
+          <div class="demo-card">
+            <div class="demo-card-img c3"></div>
+            <h4>Breakpoint nav</h4>
+            <p>Hamburger replaces the link list below 480px.</p>
+          </div>
+          <div class="demo-card">
+            <div class="demo-card-img c4"></div>
+            <h4>Media features</h4>
+            <p>Target orientation, hover, dark mode, and more.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>Responsive.css — CSS media query reference · All patterns use only native CSS, no frameworks.</p>
+  <div class="footer-links">
+    <a href="#">MDN docs</a>
+    <a href="#">Can I Use</a>
+    <a href="#">CSS spec</a>
+  </div>
+</footer>
+
+<script>
+/* ── Hamburger menu ───────────────────────────── */
+const ham = document.getElementById('hamburger');
+const menu = document.getElementById('mobileMenu');
+ham.addEventListener('click', () => {
+  ham.classList.toggle('open');
+  menu.classList.toggle('open');
+});
+
+/* ── Current breakpoint badge ─────────────────── */
+const bpBadge = document.getElementById('currentBp');
+function updateBp() {
+  const w = window.innerWidth;
+  if (w < 480)  bpBadge.textContent = `@media max-width: 480px  →  ${w}px`;
+  else if (w < 768)  bpBadge.textContent = `@media max-width: 768px  →  ${w}px`;
+  else if (w < 1024) bpBadge.textContent = `@media min-width: 768px  →  ${w}px`;
+  else bpBadge.textContent = `@media min-width: 1024px  →  ${w}px`;
+}
+window.addEventListener('resize', updateBp);
+updateBp();
+
+/* ── Demo viewport switcher ───────────────────── */
+const vp = document.getElementById('demoViewport');
+const gridLabel = document.getElementById('gridLabel');
+document.querySelectorAll('.size-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const w = btn.dataset.w;
+    vp.style.maxWidth = w === '100%' ? '100%' : w + 'px';
+    gridLabel.textContent = w === '100%' ? 'Full width' : `Simulated: ${w}px`;
+  });
+});
+</script>
+</body>
+</html>
